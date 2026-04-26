@@ -1,93 +1,127 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer'); // 👈 ADDED
 require('dotenv').config();
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-// Middleware
-app.use(cors()); // Allows frontend to fetch data
-app.use(express.json()); // Parses incoming JSON requests
+mongoose.connect(process.env.MONGO_URI).then(() => console.log('✅ MongoDB Connected'));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI,
-    ).then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.log('❌ DB Connection Error:', err));
+const Player = require('./models/Player');
 
-// --- API ROUTES ---
-
-// 1. Get Top Players for Leaderboard
-app.get('/api/leaderboard', async (req, res) => {
-    const Player = require('./models/Player');
-    try {
-        const topPlayers = await Player.find()
-            .sort({ 'stats.playPoints': -1, 'stats.goalDifference': -1 })
-            .limit(10);
-        res.json(topPlayers);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+// 📧 EMAIL TRANSPORTER SETUP
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
-// 2. Get Live & Upcoming Tournaments
-app.get('/api/tournaments', async (req, res) => {
-    const Tournament = require('./models/Tournament');
+// Helper Function: Generate 6-digit OTP
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+// ==========================================
+// 🔹 OTP AUTHENTICATION ROUTES
+// ==========================================
+
+// 1. REGISTER (Send OTP to Email)
+app.post('/api/auth/register', async (req, res) => {
     try {
-        const tournaments = await Tournament.find({ status: { $in: ['Live', 'Upcoming'] } })
-            .populate('participants', 'username');
-        res.json(tournaments);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+        const { username, email, password } = req.body;
 
-// 3. ADMIN: Approve Match Result & Auto-Update Standings (Step 9)
-app.post('/api/admin/match/approve', async (req, res) => {
-    const Match = require('./models/Match');
-    const Player = require('./models/Player');
-    const { matchId, scoreA, scoreB } = req.body;
-
-    try {
-        const match = await Match.findById(matchId);
-        match.scoreA = scoreA;
-        match.scoreB = scoreB;
-        match.status = 'Completed';
-        await match.save();
-
-        // System auto-updates PlayPoints & Stats
-        const playerA = await Player.findById(match.playerA);
-        const playerB = await Player.findById(match.playerB);
-
-        playerA.stats.matchesPlayed += 1;
-        playerB.stats.matchesPlayed += 1;
-        playerA.stats.goalsScored += scoreA;
-        playerA.stats.goalsConceded += scoreB;
-        playerB.stats.goalsScored += scoreB;
-        playerB.stats.goalsConceded += scoreA;
-
-        if (scoreA > scoreB) {
-            playerA.stats.wins += 1;
-            playerA.stats.playPoints += 3;
-            playerB.stats.losses += 1;
-        } else if (scoreB > scoreA) {
-            playerB.stats.wins += 1;
-            playerB.stats.playPoints += 3;
-            playerA.stats.losses += 1;
-        } else {
-            playerA.stats.draws += 1;
-            playerB.stats.draws += 1;
-            playerA.stats.playPoints += 1;
-            playerB.stats.playPoints += 1;
+        const existingPlayer = await Player.findOne({ $or: [{ username }, { email }] });
+        if (existingPlayer && existingPlayer.isVerified) {
+            return res.status(400).json({ error: 'Username or Email already registered.' });
         }
 
-        await playerA.save();
-        await playerB.save();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const otp = generateOTP();
+        const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        res.json({ message: '✅ Match approved and stats automatically updated!' });
+        if (existingPlayer && !existingPlayer.isVerified) {
+            // Update unverified user
+            existingPlayer.password = hashedPassword;
+            existingPlayer.otp = otp;
+            existingPlayer.otpExpires = otpExpires;
+            await existingPlayer.save();
+        } else {
+            // Create new user
+            const newPlayer = new Player({ username, email, password: hashedPassword, otp, otpExpires });
+            await newPlayer.save();
+        }
+
+        // Send Email
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Mystic Legends - Verify Your Account',
+            text: `Your registration code is: ${otp}. It expires in 10 minutes.`
+        });
+
+        res.json({ message: 'Verification code sent to your email.', step: 'verify' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// 2. LOGIN (Send OTP to Email for 2FA)
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const player = await Player.findOne({ email });
+        if (!player) return res.status(400).json({ error: 'Account not found.' });
+
+        const isMatch = await bcrypt.compare(password, player.password);
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials.' });
+
+        const otp = generateOTP();
+        player.otp = otp;
+        player.otpExpires = Date.now() + 10 * 60 * 1000;
+        await player.save();
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Mystic Legends - Login Verification',
+            text: `Your login code is: ${otp}. Do not share this with anyone.`
+        });
+
+        res.json({ message: 'Verification code sent to your email.', step: 'verify' });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error during login.' });
+    }
+});
+
+// 3. VERIFY OTP (Used for both Login & Register)
+app.post('/api/auth/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const player = await Player.findOne({ email });
+        if (!player) return res.status(400).json({ error: 'User not found.' });
+
+        if (player.otp !== otp || player.otpExpires < Date.now()) {
+            return res.status(400).json({ error: 'Invalid or expired OTP.' });
+        }
+
+        // Mark verified and clear OTP
+        player.isVerified = true;
+        player.otp = null;
+        player.otpExpires = null;
+        await player.save();
+
+        // Generate Final JWT Token
+        const token = jwt.sign({ id: player._id, role: player.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({ message: 'Verification successful!', token, user: { username: player.username, role: player.role } });
+    } catch (err) {
+        res.status(500).json({ error: 'Server error during verification.' });
+    }
+});
