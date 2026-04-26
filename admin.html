@@ -268,16 +268,16 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating DB...';
 
             try {
-                /* 
-                // 🚀 UNCOMMENT THIS WHEN YOUR NODE.JS SERVER IS RUNNING 🚀
-                const response = await fetch('http://localhost:5000/api/admin/match/approve', {
+                
+                // 🚀 UNCOMMENT THIS WHEN YOUR NODE.JS SERVER IS RUNNING 🚀 //
+                const response = await fetch('https://ml-backend-bmqa.onrender.com/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ matchId, scoreA: Number(scoreA), scoreB: Number(scoreB) })
                 });
 
                 const data = await response.json();
-                */
+            
 
                 // Simulating database network delay for the demo
                 setTimeout(() => {
