@@ -270,7 +270,7 @@
             try {
                 
                 // 🚀 UNCOMMENT THIS WHEN YOUR NODE.JS SERVER IS RUNNING 🚀 //
-                const response = await fetch('https://ml-backend-bmqa.onrender.com/', {
+                const response = await fetch('https://ml-backend-bmqa.onrender.com/api/admin/match/approve', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ matchId, scoreA: Number(scoreA), scoreB: Number(scoreB) })
