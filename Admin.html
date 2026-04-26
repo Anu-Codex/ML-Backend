@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Mystic Legends</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        primary: '#3b82f6',
+                        accent: '#f59e0b',
+                    },
+                    fontFamily: {
+                        heading:['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
+        h1, h2, h3 { font-family: 'Rajdhani', sans-serif; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- 🔹 SIDEBAR -->
+    <aside class="w-64 bg-dark border-r border-gray-800 flex flex-col hidden md:flex">
+        <div class="h-20 flex items-center px-6 border-b border-gray-800">
+            <i class="fa-solid fa-shield-halved text-primary text-2xl mr-2"></i>
+            <span class="font-heading font-bold text-xl tracking-wider uppercase">Admin Panel</span>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="#" class="flex items-center gap-3 bg-primary/10 text-primary px-4 py-3 rounded-lg font-bold transition">
+                <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 text-gray-400 hover:bg-gray-800 hover:text-white px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-futbol"></i> Pending Matches
+                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 text-gray-400 hover:bg-gray-800 hover:text-white px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-trophy"></i> Tournaments
+            </a>
+            <a href="#" class="flex items-center gap-3 text-gray-400 hover:bg-gray-800 hover:text-white px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-users"></i> Manage Players
+            </a>
+            <a href="#" class="flex items-center gap-3 text-gray-400 hover:bg-gray-800 hover:text-white px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-triangle-exclamation"></i> Disputes
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-800">
+            <button class="w-full flex items-center justify-center gap-2 text-gray-400 hover:text-red-500 py-2 transition font-bold">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- 🔹 MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <!-- Top Header -->
+        <header class="h-20 bg-darker border-b border-gray-800 flex items-center justify-between px-8 sticky top-0 z-10">
+            <h2 class="text-2xl font-heading font-bold uppercase">System Overview</h2>
+            <div class="flex items-center gap-4">
+                <a href="https://web.whatsapp.com/" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition">
+                    <i class="fa-brands fa-whatsapp"></i> Open Web WhatsApp
+                </a>
+                <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center font-bold border-2 border-primary">
+                    AD
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8">
+            <!-- 🔹 QUICK STATS -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-dark border border-gray-800 p-6 rounded-xl shadow-lg">
+                    <div class="text-gray-400 text-sm font-bold uppercase mb-2">Pending Results</div>
+                    <div class="text-4xl font-heading font-bold text-red-500">5</div>
+                </div>
+                <div class="bg-dark border border-gray-800 p-6 rounded-xl shadow-lg">
+                    <div class="text-gray-400 text-sm font-bold uppercase mb-2">Active Players</div>
+                    <div class="text-4xl font-heading font-bold text-white">1,204</div>
+                </div>
+                <div class="bg-dark border border-gray-800 p-6 rounded-xl shadow-lg">
+                    <div class="text-gray-400 text-sm font-bold uppercase mb-2">Live Tournaments</div>
+                    <div class="text-4xl font-heading font-bold text-primary">2</div>
+                </div>
+                <div class="bg-dark border border-gray-800 p-6 rounded-xl shadow-lg">
+                    <div class="text-gray-400 text-sm font-bold uppercase mb-2">Open Disputes</div>
+                    <div class="text-4xl font-heading font-bold text-accent">1</div>
+                </div>
+            </div>
+
+            <!-- 🔹 MATCH APPROVAL SYSTEM (STEP 9) -->
+            <div class="bg-dark border border-gray-800 rounded-xl shadow-lg mb-8">
+                <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+                    <h3 class="text-xl font-heading font-bold uppercase text-white"><i class="fa-solid fa-list-check text-primary mr-2"></i> Verify Match Results</h3>
+                    <span class="text-xs text-gray-400">Review WhatsApp screenshots & enter scores</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-300">
+                        <thead class="text-xs uppercase bg-gray-800/50">
+                            <tr>
+                                <th class="px-6 py-4">Match ID</th>
+                                <th class="px-6 py-4">Tournament / League</th>
+                                <th class="px-6 py-4 text-center">Matchup</th>
+                                <th class="px-6 py-4 text-center">Submitted By</th>
+                                <th class="px-6 py-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Pending Match Row -->
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition">
+                                <td class="px-6 py-4 font-mono text-xs text-gray-500">#M-8492</td>
+                                <td class="px-6 py-4 font-bold">Weekend Cup (Semi-Final)</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="font-bold text-white">Mystic_King</span> 
+                                    <span class="text-gray-500 mx-2">vs</span> 
+                                    <span class="font-bold text-white">FC_Striker99</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs"><i class="fa-brands fa-whatsapp mr-1"></i> Mystic_King</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button onclick="openScoreModal('M-8492', 'Mystic_King', 'FC_Striker99', '64b1f2a...')" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold transition">
+                                        Approve Score
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Another Row -->
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition">
+                                <td class="px-6 py-4 font-mono text-xs text-gray-500">#M-8493</td>
+                                <td class="px-6 py-4 font-bold text-accent">FC Mobile League</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="font-bold text-white">BeastMode_X</span> 
+                                    <span class="text-gray-500 mx-2">vs</span> 
+                                    <span class="font-bold text-white">TikiTaka_Master</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs"><i class="fa-brands fa-whatsapp mr-1"></i> TikiTaka_Master</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <button onclick="openScoreModal('M-8493', 'BeastMode_X', 'TikiTaka_Master', '64b1f2b...')" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold transition">
+                                        Approve Score
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 🔹 CREATE TOURNAMENT SHORTCUT -->
+            <div class="bg-dark border border-gray-800 rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-heading font-bold uppercase text-white mb-4"><i class="fa-solid fa-plus-circle text-accent mr-2"></i> Quick Create Tournament</h3>
+                <form class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input type="text" placeholder="Tournament Name" class="bg-darker border border-gray-700 rounded px-4 py-2 text-white focus:border-primary outline-none">
+                    <select class="bg-darker border border-gray-700 rounded px-4 py-2 text-white focus:border-primary outline-none">
+                        <option>Knockout Format</option>
+                        <option>Group + Knockout</option>
+                        <option>League / Swiss</option>
+                    </select>
+                    <input type="date" class="bg-darker border border-gray-700 rounded px-4 py-2 text-gray-400 focus:border-primary outline-none">
+                    <button type="button" class="bg-accent hover:bg-yellow-600 text-darker font-bold py-2 rounded transition">
+                        Initialize Tournament
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 🔹 MATCH APPROVAL MODAL (Hidden by default) -->
+    <div id="scoreModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-dark border border-gray-700 rounded-xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+                <h3 class="text-xl font-heading font-bold text-white">Enter Official Result</h3>
+                <button onclick="closeScoreModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="p-6">
+                <p class="text-sm text-gray-400 mb-6 text-center">Verify the screenshot submitted on WhatsApp, then enter the final score here. <strong class="text-white">This will auto-update the Leaderboard.</strong></p>
+                
+                <div class="flex items-center justify-between gap-4 mb-8">
+                    <!-- Player A -->
+                    <div class="text-center flex-1">
+                        <label id="modalPlayerA" class="block font-bold text-white mb-2">Player A</label>
+                        <input type="number" id="scoreA" min="0" class="w-20 text-center bg-darker border-2 border-gray-700 rounded-lg py-3 text-2xl font-bold text-white focus:border-primary outline-none" placeholder="0">
+                    </div>
+                    
+                    <div class="text-gray-500 font-bold text-xl pt-6">VS</div>
+                    
+                    <!-- Player B -->
+                    <div class="text-center flex-1">
+                        <label id="modalPlayerB" class="block font-bold text-white mb-2">Player B</label>
+                        <input type="number" id="scoreB" min="0" class="w-20 text-center bg-darker border-2 border-gray-700 rounded-lg py-3 text-2xl font-bold text-white focus:border-primary outline-none" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Hidden Input for Database ID -->
+                <input type="hidden" id="modalMatchId">
+
+                <button onclick="submitScoreToDatabase()" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-lg flex justify-center items-center gap-2 transition">
+                    <i class="fa-solid fa-check-circle"></i> Confirm & Update Database
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 JAVASCRIPT FOR DASHBOARD LOGIC -->
+    <script>
+        const modal = document.getElementById('scoreModal');
+        const modalContent = document.getElementById('modalContent');
+        
+        // 1. Open the Modal when Admin clicks "Approve Score"
+        function openScoreModal(matchDisplayId, playerA, playerB, dbMatchId) {
+            document.getElementById('modalPlayerA').innerText = playerA;
+            document.getElementById('modalPlayerB').innerText = playerB;
+            document.getElementById('modalMatchId').value = dbMatchId; // The MongoDB _id
+            
+            // Reset inputs
+            document.getElementById('scoreA').value = '';
+            document.getElementById('scoreB').value = '';
+
+            // UI Animation
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // 2. Close the Modal
+        function closeScoreModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // 3. Send the Data to the Node.js/MongoDB Backend
+        async function submitScoreToDatabase() {
+            const scoreA = document.getElementById('scoreA').value;
+            const scoreB = document.getElementById('scoreB').value;
+            const matchId = document.getElementById('modalMatchId').value;
+
+            if(scoreA === '' || scoreB === '') {
+                alert("Please enter a score for both players.");
+                return;
+            }
+
+            // Change button text to show loading state
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating DB...';
+
+            try {
+                /* 
+                // 🚀 UNCOMMENT THIS WHEN YOUR NODE.JS SERVER IS RUNNING 🚀
+                const response = await fetch('http://localhost:5000/api/admin/match/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matchId, scoreA: Number(scoreA), scoreB: Number(scoreB) })
+                });
+
+                const data = await response.json();
+                */
+
+                // Simulating database network delay for the demo
+                setTimeout(() => {
+                    alert("✅ Success! Score approved. Player stats and Leaderboard have been automatically updated.");
+                    closeScoreModal();
+                    btn.innerHTML = originalText;
+                    
+                    // Here you would remove the row from the HTML table
+                    // document.getElementById(`row-${matchId}`).remove();
+                }, 1000);
+
+            } catch (error) {
+                console.error("Error updating match:", error);
+                alert("Database connection failed. Is the server running?");
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
+</body>
+      </html>
